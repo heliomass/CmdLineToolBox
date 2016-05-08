@@ -1,0 +1,45 @@
+#!/bin/bash
+
+arg_L=
+arg_P=
+destination=
+
+# Parse command arguments
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-L)
+			arg_L='-L'
+			shift
+			;;
+		-P)
+			arg_P='-P'
+			shift
+			;;
+		-PL|-LP)
+			arg_L='-L'
+			arg_P='-P'
+			shift
+			;;
+		-*)
+			echo "Invalid switch: $1" >&2
+			exit 1
+			;;
+		*)
+			destination=$1
+			break
+			;;
+	esac
+done
+
+if [ -z "$destination" ]; then
+	# Standard usage of pwd.
+	pwd $arg_L $arg_P
+else
+	# Check the file exists!
+	if [ ! -f "$destination" -a ! -d "$destination" ]; then
+		echo "File or directory '${destination}' does not exist relative to current location." >&2
+		exit 1
+	fi
+	# Execute pwd with the destination added onto the end.
+	echo "$(pwd $arg_L $arg_P)/${destination}"
+fi

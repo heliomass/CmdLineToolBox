@@ -1,0 +1,97 @@
+#!/bin/bash
+#
+# Verbose Boot Toggle v1.0
+# By Daniel Demby
+# heliomass@gmail.com
+# http://heliomass.com
+#
+# Toggle your Mac's verbose boot on and off.
+
+# Don't change these!
+export VERSION='1.0'; # Script version
+
+# Mac only
+function check_osx() {
+
+	if [ "$(uname)" == 'Darwin' ]; then
+		return 0
+	else
+		return 1
+	fi
+
+}
+
+# Dependencies
+function check_deps() {
+
+	local __missing_dep=0
+
+	if [ -z "$(which nvram)" ]; then
+		echo 'Missing nvram.' >&2
+		__missing_dep=1
+	fi
+	if [ -z "$(which sudo)" ]; then
+		echo 'Missing sudo.' >&2
+		__missing_dep=1
+	fi
+
+	return $__missing_dep
+
+}
+
+# Help
+function display_help() {
+
+	echo ''
+	echo "Verbose Boot Toggle v${VERSION}"
+	echo ''
+	echo 'Run without any switches to toggle verbose boot.'
+	echo ''
+	echo "--help"
+	echo '   Display this help screen.'
+	echo ''
+
+}
+
+# Parse command arguments
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--help|-h|-?)
+			display_help
+			exit 0
+			;;
+		*)
+			echo "Unrecognised paramter ${1}. Please use the --help switch to see usage." >&2
+			exit 1
+			;;
+	esac
+done
+
+# Check we're running on a Mac.
+check_osx
+if [ $? -ne 0 ]; then
+	echo 'This script will only function under OS X.' >&2
+	exit 1
+fi
+
+# Check dependencies
+check_deps
+if [ $? -ne 0 ]; then
+	exit 1
+fi
+
+echo 'You may need to supply your root password to make the change.'
+
+# What's the current setting?
+current_setting=$(nvram -p | grep boot-args | grep '\-v' | wc -l)
+
+if [ $current_setting -eq 0 ]; then
+	echo 'Switching verbose boot on.'
+	sudo nvram boot-args="-v"
+else
+	echo 'Disabling verbose boot.'
+	sudo nvram boot-args=
+fi
+
+# Sleep for 1 seconds to give the change time to take effect.
+sleep 1
