@@ -48,7 +48,7 @@ $ pwd
 /Users/heliomass/Projects/settings/scripts/bin
 ```
 
-### Expanded Usage
+#### Expanded Usage
 
 ```Shell
 $ pwd magic_pwd
@@ -62,4 +62,16 @@ $ pwd
 /Users/heliomass/Projects/settings
 $ pwd scripts/bin/magic_pwd
 /Users/heliomass/Projects/settings/scripts/bin/magic_pwd
+```
+
+## Check "Find My Mac"
+
+If you clear the NVRAM on an older Mac, it can cause Find My Mac to become disabled.
+
+You can run the script `check_fmm` as a cron at regular intervals, and have [Growl](http://growl.info) report when Find My Mac is off.
+
+For example:
+
+```
+08  * * * * check_fmm --growl > ~/check_fmm.log 2>&1
 ```
